@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Skills — Interactive Guide</title>
+<style>
+:root{
+  --bg:#faf9f7; --panel:#fff; --ink:#1c1b19; --muted:#6b6862; --line:#e5e1da;
+  --accent:#c15f3c; --accent-soft:#f6e8e2; --code:#f3f1ed; --ok:#2f7d5d; --bad:#b5452e;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#151412; --panel:#1d1c1a; --ink:#ece9e4; --muted:#9a958c; --line:#302e2b;
+    --accent:#e08b62; --accent-soft:#2c211c; --code:#232220; --ok:#6cc39a; --bad:#e08b6f; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:1.5rem}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 ui-sans-serif,-apple-system,"Segoe UI",Inter,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:3rem;
+  max-width:1180px;margin:0 auto;padding:2.5rem 1.5rem 6rem}
+nav{position:sticky;top:2rem;align-self:start;font-size:.87rem}
+nav a{display:block;padding:.3rem 0 .3rem .7rem;color:var(--muted);text-decoration:none;
+  border-left:2px solid var(--line)}
+nav a:hover{color:var(--ink)}
+nav a.on{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+nav .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin:0 0 .6rem .7rem}
+header h1{font-size:2.6rem;line-height:1.1;margin:0 0 .5rem;letter-spacing:-.02em}
+header p.sub{color:var(--muted);font-size:1.05rem;margin:0 0 2.5rem;max-width:56ch}
+section{margin:0 0 3.5rem;scroll-margin-top:1.5rem}
+h2{font-size:1.5rem;letter-spacing:-.01em;margin:0 0 .2rem;padding-top:.5rem}
+h2::before{content:attr(data-n);color:var(--accent);font-size:.75rem;font-weight:700;
+  display:block;letter-spacing:.12em;margin-bottom:.35rem}
+h3{font-size:1.05rem;margin:1.8rem 0 .5rem}
+p{margin:.7rem 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;
+  background:var(--code);padding:.12em .38em;border-radius:4px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:10px;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:.84rem;line-height:1.55;position:relative}
+pre code{background:none;padding:0;font-size:1em}
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.9rem;display:block;overflow-x:auto}
+th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);
+  border-radius:0 10px 10px 0;padding:.9rem 1.1rem;margin:1.2rem 0;font-size:.94rem}
+ul,ol{padding-left:1.2rem} li{margin:.35rem 0}
+.good{color:var(--ok);font-weight:600} .bad{color:var(--bad);font-weight:600}
+
+/* progressive disclosure widget */
+.pd{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:1.4rem 0}
+@media(max-width:820px){.pd{grid-template-columns:1fr}}
+.lv{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:.9rem 1rem;
+  cursor:pointer;transition:.18s;display:block;width:100%;text-align:left;font:inherit;color:inherit}
+.lv:hover{border-color:var(--accent)}
+.lv.on{border-color:var(--accent);background:var(--accent-soft)}
+.lv b{display:block;font-size:.95rem}
+.lv span{font-size:.82rem;color:var(--muted)}
+.ctx{border:1px dashed var(--line);border-radius:12px;padding:1rem;background:var(--panel);
+  font-size:.84rem;font-family:ui-monospace,Menlo,monospace;min-height:190px}
+.ctx .row{padding:.35rem .5rem;border-radius:6px;margin-bottom:.3rem;background:var(--code)}
+.ctx .row.dim{opacity:.4}
+.bar{height:8px;background:var(--code);border-radius:99px;overflow:hidden;margin:.9rem 0 .4rem}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+
+/* linter */
+.lint textarea,.lint input{width:100%;background:var(--code);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:.6rem .7rem;font:inherit;font-size:.9rem}
+.lint textarea{min-height:80px;resize:vertical}
+.lint label{font-size:.75rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  display:block;margin:.9rem 0 .3rem}
+.res{margin-top:1rem;font-size:.9rem}
+.res div{padding:.3rem 0;display:flex;gap:.5rem;align-items:flex-start}
+.res .i{flex:0 0 1.1rem}
+
+/* checklist */
+.chk{columns:2;column-gap:2rem}
+@media(max-width:820px){.chk{columns:1}}
+.chk label{display:block;break-inside:avoid;font-size:.9rem;margin:.3rem 0;cursor:pointer}
+.chk input{margin-right:.5rem;accent-color:var(--accent)}
+.chk h4{margin:1rem 0 .4rem;font-size:.75rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.copy{position:absolute;top:.55rem;right:.55rem;font-size:.7rem;padding:.25rem .5rem;
+  border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:6px;cursor:pointer}
+.copy:hover{color:var(--accent);border-color:var(--accent)}
+footer{border-top:1px solid var(--line);padding-top:1.5rem;font-size:.87rem;color:var(--muted)}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <p class="lbl">Contents</p>
+  <a href="#what">What a Skill is</a>
+  <a href="#pd">Progressive disclosure</a>
+  <a href="#structure">File structure</a>
+  <a href="#rules">Hard rules</a>
+  <a href="#front">Frontmatter</a>
+  <a href="#body">Writing the body</a>
+  <a href="#where">Where Skills live</a>
+  <a href="#test">Testing</a>
+  <a href="#fail">Failure modes</a>
+  <a href="#patterns">Patterns</a>
+  <a href="#sec">Security</a>
+  <a href="#check">Checklist</a>
+</nav>
+
+<main>
+<header>
+  <h1>Agent Skills</h1>
+  <p class="sub">A folder that teaches Claude how you work. Write it once, and it loads itself whenever a request matches — costing almost nothing until it does.</p>
+</header>
+
+<section id="what">
+  <h2 data-n="01">What a Skill is</h2>
+  <p>A Skill is a directory containing instructions in Markdown, plus optional scripts and reference files. Claude reads it from the filesystem with bash when your request matches its description.</p>
+  <p>Think onboarding guide for a new hire, not plugin. It carries procedural knowledge: workflows, house style, domain rules.</p>
+  <table>
+    <tr><th>Thing</th><th>What it gives Claude</th></tr>
+    <tr><td>Prompt</td><td>One-off instructions, this conversation only</td></tr>
+    <tr><td>MCP server</td><td>Access to tools and live data — what Claude <em>can</em> do</td></tr>
+    <tr><td>Skill</td><td>Workflow knowledge — how Claude <em>should</em> do it</td></tr>
+  </table>
+  <div class="note">MCP is the professional kitchen. A Skill is the recipe. Users with both accomplish complex tasks without figuring out every step themselves.</div>
+</section>
+
+<section id="pd">
+  <h2 data-n="02">Progressive disclosure</h2>
+  <p>Content loads in levels. Click a level to see what enters the context window.</p>
+  <div class="pd">
+    <div>
+      <button class="lv on" data-lv="1"><b>Level 1 — Metadata</b><span>Always loaded at startup · ~100 tokens per Skill</span></button>
+      <button class="lv" data-lv="2"><b>Level 2 — SKILL.md body</b><span>Loaded when the Skill triggers · under ~5k tokens</span></button>
+      <button class="lv" data-lv="3"><b>Level 3 — references/ &amp; assets/</b><span>Loaded only when Claude reads the file · zero until then</span></button>
+      <button class="lv" data-lv="4"><b>Level 3 — scripts/</b><span>Run via bash · only the output costs tokens</span></button>
+    </div>
+    <div>
+      <div class="ctx" id="ctx"></div>
+      <div class="bar"><i id="barfill"></i></div>
+      <p style="font-size:.82rem;color:var(--muted);margin:0" id="cost"></p>
+    </div>
+  </div>
+  <p>Two consequences matter. Installing many Skills costs almost nothing until one fires. And bundled content is effectively unbounded — a Skill can ship a 200-page API reference that costs zero tokens on every request that doesn't need it.</p>
+  <p>Scripts are the sharpest tool here. The code never enters context, only its output, and execution is deterministic where language interpretation is not.</p>
+</section>
+
+<section id="structure">
+  <h2 data-n="03">File structure</h2>
+<pre><code>your-skill-name/
+├── SKILL.md          # required — instructions + YAML frontmatter
+├── scripts/          # optional — executable code
+│   └── validate.py
+├── references/       # optional — docs Claude reads as needed
+│   └── api-guide.md
+└── assets/           # optional — templates, fonts, icons used in output
+    └── report-template.md</code></pre>
+</section>
+
+<section id="rules">
+  <h2 data-n="04">Hard rules</h2>
+  <ul>
+    <li>The file is named exactly <code>SKILL.md</code>. Case-sensitive, no variations.</li>
+    <li>Folder name in kebab-case: <code>notion-project-setup</code>. No spaces, underscores, or capitals.</li>
+    <li>No <code>README.md</code> inside the Skill folder. Docs go in SKILL.md or <code>references/</code>. A repo-level README for human visitors is separate and fine.</li>
+    <li><code>name</code>: max 64 chars, lowercase letters, numbers, hyphens. Cannot contain "claude" or "anthropic" — reserved.</li>
+    <li><code>description</code>: non-empty, max 1024 chars.</li>
+    <li>No XML angle brackets anywhere in the frontmatter. It lands in the system prompt, so this is an injection guard.</li>
+  </ul>
+</section>
+
+<section id="front">
+  <h2 data-n="05">Frontmatter</h2>
+  <p>Minimum viable:</p>
+<pre><code>---
+name: your-skill-name
+description: What it does. Use when the user asks to [specific phrases].
+---</code></pre>
+  <p>Optional fields:</p>
+<pre><code>license: MIT
+compatibility: Requires Python 3.11 and network access   # 1–500 chars
+allowed-tools: "Bash(python:*) Bash(npm:*) WebFetch"
+metadata:
+  author: Company Name
+  version: 1.0.0
+  mcp-server: server-name</code></pre>
+
+  <h3>The description does all the routing work</h3>
+  <p>It is the only thing Claude sees before deciding to load the Skill. Structure it as <strong>what it does + when to use it + trigger phrases</strong>.</p>
+  <p class="good">Good</p>
+<pre><code>description: Analyzes Figma design files and generates developer handoff
+  documentation. Use when the user uploads .fig files, asks for "design specs",
+  "component documentation", or "design-to-code handoff".</code></pre>
+  <p class="bad">Bad</p>
+<pre><code>description: Helps with projects.                          # too vague
+description: Creates multi-page documentation systems.     # no triggers
+description: Implements the Project entity model.          # no user language</code></pre>
+
+  <h3 class="lint">Check yours</h3>
+  <div class="card lint">
+    <label for="nm">name</label>
+    <input id="nm" value="my-skill" spellcheck="false">
+    <label for="ds">description</label>
+    <textarea id="ds" spellcheck="false">Helps with projects.</textarea>
+    <div class="res" id="res"></div>
+  </div>
+  <p style="font-size:.85rem;color:var(--muted)">Heuristics only — they catch the mechanical failures, not whether the description reads well.</p>
+</section>
+
+<section id="body">
+  <h2 data-n="06">Writing the body</h2>
+<pre><code># Skill Name
+
+## Instructions
+### Step 1: [First major step]
+What happens, and the exact command:
+`python scripts/fetch_data.py --project-id PROJECT_ID`
+Expected output: [what success looks like]
+
+## Examples
+User says: "Set up a new marketing campaign"
+Actions: 1. Fetch existing campaigns  2. Create with parameters
+Result: Campaign created with confirmation link
+
+## Troubleshooting
+Error: [message] → Cause: [why] → Solution: [fix]</code></pre>
+  <p>Rules that hold up in practice:</p>
+  <ul>
+    <li>Be specific and runnable. <em>"Run <code>python scripts/validate.py --input {file}</code>"</em> beats <em>"validate the data before proceeding."</em></li>
+    <li>Put critical instructions at the top. Buried rules get skipped.</li>
+    <li>Replace ambiguous language with explicit checks: <em>"CRITICAL: before calling <code>create_project</code>, verify name is non-empty, one team member assigned, start date not in the past."</em></li>
+    <li>For validations that must not fail, bundle a script instead of trusting prose.</li>
+    <li>Keep SKILL.md under ~5,000 words. Push the rest into <code>references/</code> and link it.</li>
+    <li>Skills compose. Assume others are loaded alongside yours.</li>
+  </ul>
+</section>
+
+<section id="where">
+  <h2 data-n="07">Where Skills live</h2>
+  <table>
+    <tr><th>Surface</th><th>How to install</th><th>Sharing scope</th></tr>
+    <tr><td>Claude Code</td><td><code>~/.claude/skills/</code> (personal) or <code>.claude/skills/</code> (project)</td><td>Personal, project, or via plugins</td></tr>
+    <tr><td>claude.ai</td><td>Settings → Capabilities → Skills, upload a zip</td><td>Per user; admins can deploy org-wide</td></tr>
+    <tr><td>Claude API</td><td><code>/v1/skills</code>, referenced in <code>container.skills</code></td><td>Workspace-wide</td></tr>
+  </table>
+  <div class="note">Skills do not sync across surfaces. Upload separately to each one you want them on.</div>
+  <p>Runtime differs too. Claude Code gives full network access and normal filesystem reach. The API sandbox has no network access and no runtime package installation — preinstalled packages only — and requires the code execution tool.</p>
+</section>
+
+<section id="test">
+  <h2 data-n="08">Testing</h2>
+  <ol>
+    <li><strong>Triggering.</strong> Run 10–20 queries. Fires on obvious asks and paraphrases, stays quiet on unrelated ones. Aim for ~90% on relevant queries.</li>
+    <li><strong>Function.</strong> Correct outputs, successful tool calls, error paths, edge cases.</li>
+    <li><strong>Baseline comparison.</strong> Same task with and without the Skill. Count messages, tool calls, failures, tokens.</li>
+  </ol>
+  <div class="note"><strong>Debugging trick.</strong> Ask Claude: "when would you use the [skill-name] skill?" It quotes the description back, which shows you exactly what's missing.</div>
+  <p>Fastest path to a good Skill: iterate on one hard task in a normal conversation until Claude gets it right, then extract that winning approach into a Skill. Expand to more cases afterward.</p>
+</section>
+
+<section id="fail">
+  <h2 data-n="09">Failure modes</h2>
+  <table>
+    <tr><th>Symptom</th><th>Fix</th></tr>
+    <tr><td>Never triggers</td><td>Description too generic. Add trigger phrases, technical keywords, file types.</td></tr>
+    <tr><td>Triggers on everything</td><td>Narrow the scope; add negative triggers — "Do NOT use for X, use the Y skill instead."</td></tr>
+    <tr><td>Loads but instructions ignored</td><td>Too verbose, buried, or ambiguous. Trim, move critical rules to the top, replace prose checks with scripts.</td></tr>
+    <tr><td>Slow or degraded responses</td><td>SKILL.md too large, or too many Skills enabled. Move detail to <code>references/</code>; audit if you have 20–50+ enabled.</td></tr>
+    <tr><td>Won't upload</td><td><code>SKILL.md</code> misspelled, missing <code>---</code> delimiters, unclosed quotes, or a name with spaces/capitals.</td></tr>
+  </table>
+</section>
+
+<section id="patterns">
+  <h2 data-n="10">Patterns</h2>
+  <p>Three common Skill shapes:</p>
+  <ul>
+    <li><strong>Document and asset creation</strong> — embedded style guides, templates, quality checklists. No external tools needed.</li>
+    <li><strong>Workflow automation</strong> — step-by-step processes with validation gates and refinement loops.</li>
+    <li><strong>MCP enhancement</strong> — sequences multiple MCP calls, embeds domain expertise, handles common API errors.</li>
+  </ul>
+  <p>Useful patterns within those: sequential orchestration with explicit dependencies and rollback; multi-MCP coordination in phases; iterative refinement against a quality script; context-aware tool selection via a decision tree; domain rules applied before action, with an audit trail.</p>
+</section>
+
+<section id="sec">
+  <h2 data-n="11">Security</h2>
+  <p>Install Skills only from sources you trust. A Skill directs Claude to run code and invoke tools, so a malicious one can exfiltrate data or misuse system access.</p>
+  <p>Audit every bundled file — SKILL.md, scripts, assets — for network calls or file access that doesn't match the stated purpose. Skills that fetch external URLs carry extra risk: fetched content can carry instructions, and remote dependencies can change after you vetted them. Treat installing a Skill like installing software.</p>
+</section>
+
+<section id="check">
+  <h2 data-n="12">Checklist</h2>
+  <div class="card chk" id="chk">
+    <h4>Before you start</h4>
+    <label><input type="checkbox">2–3 concrete use cases identified</label>
+    <label><input type="checkbox">Tools identified (built-in or MCP)</label>
+    <label><input type="checkbox">Folder structure planned</label>
+    <h4>During development</h4>
+    <label><input type="checkbox">Folder named in kebab-case</label>
+    <label><input type="checkbox"><code>SKILL.md</code> spelled exactly</label>
+    <label><input type="checkbox">YAML has <code>---</code> delimiters</label>
+    <label><input type="checkbox"><code>name</code> kebab-case, no reserved words</label>
+    <label><input type="checkbox"><code>description</code> covers what <em>and</em> when</label>
+    <label><input type="checkbox">No angle brackets anywhere</label>
+    <label><input type="checkbox">Instructions clear and actionable</label>
+    <label><input type="checkbox">Error handling included</label>
+    <label><input type="checkbox">Examples provided</label>
+    <label><input type="checkbox">References clearly linked</label>
+    <h4>Before shipping</h4>
+    <label><input type="checkbox">Triggers on obvious asks</label>
+    <label><input type="checkbox">Triggers on paraphrases</label>
+    <label><input type="checkbox">Stays quiet on unrelated asks</label>
+    <label><input type="checkbox">Functional tests pass</label>
+    <label><input type="checkbox">Tool integration works</label>
+    <h4>After shipping</h4>
+    <label><input type="checkbox">Watch for under/over-triggering</label>
+    <label><input type="checkbox">Collect feedback</label>
+    <label><input type="checkbox">Iterate the description first</label>
+    <label><input type="checkbox">Bump <code>metadata.version</code></label>
+  </div>
+  <p style="font-size:.85rem;color:var(--muted)">Ticks are saved in this browser.</p>
+</section>
+
+<footer>
+  <p>Sources:
+  <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills overview</a> ·
+  <a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills">Engineering blog</a> ·
+  <a href="https://github.com/anthropics/skills">anthropics/skills</a> ·
+  <a href="https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf">The Complete Guide to Building Skills for Claude</a></p>
+</footer>
+</main>
+</div>
+
+<script>
+// --- progressive disclosure widget ---
+const LEVELS = {
+  1:{rows:[["name + description (frontmatter)",1]],tok:100,
+     note:"Every installed Skill contributes this. 50 Skills ≈ 5k tokens, always."},
+  2:{rows:[["name + description (frontmatter)",1],["SKILL.md body — workflow instructions",1]],tok:3500,
+     note:"Claude matched your request against the description and ran `cat SKILL.md`."},
+  3:{rows:[["name + description (frontmatter)",1],["SKILL.md body — workflow instructions",1],
+     ["references/api-guide.md",1],["references/schema.md",0],["assets/template.md",0]],tok:7200,
+     note:"Only the referenced file loaded. The other bundled files cost nothing."},
+  4:{rows:[["name + description (frontmatter)",1],["SKILL.md body — workflow instructions",1],
+     ["scripts/validate.py — source code",0],["→ stdout: \"Validation passed\"",1]],tok:3560,
+     note:"The script ran via bash. Its code never entered context; only the output did."}
+};
+const ctx=document.getElementById('ctx'), fill=document.getElementById('barfill'), cost=document.getElementById('cost');
+function render(n){
+  const L=LEVELS[n];
+  ctx.innerHTML=L.rows.map(([t,on])=>`<div class="row${on?'':' dim'}">${on?'':'· '}${t}</div>`).join('');
+  fill.style.width=Math.min(100,L.tok/120)+'%';
+  cost.textContent=`≈ ${L.tok.toLocaleString()} tokens in context. ${L.note}`;
+}
+document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.lv').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); render(b.dataset.lv);
+});
+render(1);
+
+// --- description linter ---
+const nm=document.getElementById('nm'), ds=document.getElementById('ds'), res=document.getElementById('res');
+const TRIGGER=/\b(use when|use this when|trigger|user (says|asks|mentions|uploads)|when the user)\b/i;
+function lint(){
+  const n=nm.value.trim(), d=ds.value.trim(), out=[];
+  const ok=(m)=>out.push(['✓','ok',m]), no=(m)=>out.push(['✗','bad',m]);
+  /^[a-z0-9-]+$/.test(n)&&n ? ok('name is kebab-case') : no('name must be lowercase letters, numbers, hyphens only');
+  n.length<=64 ? ok('name within 64 chars') : no(`name is ${n.length} chars, max 64`);
+  /claude|anthropic/i.test(n) ? no('name contains a reserved word (claude / anthropic)') : ok('no reserved words in name');
+  d ? ok('description is non-empty') : no('description is required');
+  d.length<=1024 ? ok(`description ${d.length}/1024 chars`) : no(`description is ${d.length} chars, max 1024`);
+  /[<>]/.test(n+d) ? no('angle brackets are forbidden in frontmatter') : ok('no angle brackets');
+  TRIGGER.test(d) ? ok('states WHEN to use it') : no('no trigger condition — add "Use when the user…"');
+  d.split(/\s+/).length>=12 ? ok('detailed enough to route on') : no('too short; name the tasks and phrases users would say');
+  /"[^"]+"|'[^']+'|\.\w{2,4}\b/.test(d) ? ok('includes quoted phrases or file types') : no('add literal trigger phrases in quotes, or file extensions');
+  res.innerHTML=out.map(([i,c,m])=>`<div><span class="i ${c}">${i}</span><span>${m}</span></div>`).join('');
+}
+nm.oninput=ds.oninput=lint; lint();
+
+// --- checklist persistence ---
+const boxes=[...document.querySelectorAll('#chk input')];
+try{
+  const saved=JSON.parse(localStorage.getItem('skills-checklist')||'[]');
+  boxes.forEach((b,i)=>b.checked=!!saved[i]);
+  boxes.forEach(b=>b.onchange=()=>localStorage.setItem('skills-checklist',JSON.stringify(boxes.map(x=>x.checked))));
+}catch(e){}
+
+// --- copy buttons ---
+document.querySelectorAll('pre').forEach(p=>{
+  const b=document.createElement('button'); b.className='copy'; b.textContent='copy';
+  b.onclick=()=>{navigator.clipboard.writeText(p.querySelector('code').textContent);
+    b.textContent='copied'; setTimeout(()=>b.textContent='copy',1200);};
+  p.appendChild(b);
+});
+
+// --- scrollspy ---
+const links=[...document.querySelectorAll('nav a')];
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on', l.getAttribute('href')==='#'+e.target.id)); }});
+},{rootMargin:'-10% 0px -75% 0px'});
+document.querySelectorAll('section').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
